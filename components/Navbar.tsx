@@ -2,28 +2,26 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
+import { useTheme } from "./ThemeProvider";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { user, refresh } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Remove scroll-based state changes - navbar stays consistent
+  // useEffect removed to prevent layout shifts
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsMobileMenuOpen(false);
     }
   };
 
@@ -38,48 +36,80 @@ export default function Navbar() {
     }
   };
 
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About Us" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/examples", label: "Examples" },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname?.startsWith(href);
+  };
+
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-200 ${
-        isScrolled
-          ? "bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-900 shadow-sm"
-          : "bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-900"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-slate-200/50 dark:border-slate-700/50 shadow-premium-lg backdrop-blur-xl bg-white/90 dark:bg-slate-900/90"
       role="navigation"
       aria-label="Main navigation"
+      style={{ height: '64px' }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex justify-between items-center h-full">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2.5 group"
-            aria-label="Marketing Examples Home"
+            className="flex items-center space-x-3 group relative"
+            aria-label="Brand Verse Home"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
-              <div className="relative w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">M</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+              <div className="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-premium">
+                <span className="text-white font-bold text-lg">BV</span>
               </div>
             </div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
-              MarketingExamples
+            <span className="text-xl font-bold font-poppins bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+              Brand Verse
             </span>
           </Link>
 
-          {/* Desktop Search */}
-          <div className="hidden lg:flex items-center flex-1 justify-center max-w-md mx-12">
-            <form onSubmit={handleSearch} className="w-full relative">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  isActive(link.href)
+                    ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                    : "text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+              >
+                {link.label}
+                {isActive(link.href) && (
+                  <span className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full"></span>
+                )}
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center space-x-3">
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="relative hidden xl:block">
               <input
                 type="search"
                 placeholder="Search examples..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-9 text-sm border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white placeholder-gray-400 transition-all bg-gray-50 dark:bg-gray-900/50"
+                className="w-64 px-4 py-2.5 pl-10 text-sm bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-400 transition-all duration-200"
                 aria-label="Search examples"
               />
               <svg
-                className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -92,63 +122,93 @@ export default function Navbar() {
                 />
               </svg>
             </form>
-          </div>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Link
-              href="/about"
-              className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200"
+              aria-label="Toggle theme"
             >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
-            >
-              Contact
-            </Link>
-            <div className="h-4 w-px bg-gray-200 dark:bg-gray-800 mx-2"></div>
+              {theme === "light" ? (
+                <svg
+                  className="w-5 h-5 text-slate-700 dark:text-slate-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-slate-700 dark:text-slate-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* Auth Buttons / Profile */}
             {user ? (
-              <>
-                <span className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
-                  {user.name || user.email}
-                </span>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href="/profile"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200 group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm shadow-premium flex-shrink-0">
+                    {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden xl:block whitespace-nowrap">
+                    {user.name || user.email?.split("@")[0]}
+                  </span>
+                </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 whitespace-nowrap"
                 >
                   Sign Out
                 </button>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="flex items-center space-x-2">
                 <Link
                   href="/signin"
-                  className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 whitespace-nowrap"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium"
+                  className="px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-colors duration-200 shadow-premium whitespace-nowrap"
                 >
                   Sign Up
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="md:hidden p-2 -mr-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors"
+            className="lg:hidden p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <svg
-              className="h-5 w-5"
+              className="h-6 w-6 text-slate-700 dark:text-slate-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -173,19 +233,20 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-1 border-t border-gray-100 dark:border-gray-900">
-            <form onSubmit={handleSearch} className="px-2 pb-3">
+          <div className="lg:hidden py-4 space-y-2 border-t border-slate-200 dark:border-slate-700 mt-2 animate-fade-in">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="pb-3">
               <div className="relative">
                 <input
                   type="search"
                   placeholder="Search examples..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 pl-9 text-sm border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white bg-gray-50"
+                  className="w-full px-4 py-2.5 pl-10 text-sm bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 dark:text-white placeholder-slate-400"
                   aria-label="Search examples"
                 />
                 <svg
-                  className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -199,32 +260,56 @@ export default function Navbar() {
                 </svg>
               </div>
             </form>
-            <Link
-              href="/about"
-              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition-colors font-medium"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition-colors font-medium"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
-            <div className="border-t border-gray-100 dark:border-gray-900 pt-2 mt-2">
+
+            {/* Mobile Navigation Links */}
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 ${
+                  isActive(link.href)
+                    ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Mobile Theme Toggle & Auth */}
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
+              >
+                <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+                {theme === "light" ? (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )}
+              </button>
+
               {user ? (
                 <>
-                  <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
-                    {user.name || user.email}
-                  </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
+                  >
+                    Profile
+                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="block w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition-colors font-medium text-center mt-1"
+                    className="w-full px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left"
                   >
                     Sign Out
                   </button>
@@ -233,15 +318,15 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/signin"
-                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/signup"
-                    className="block px-3 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium text-center mt-1"
                     onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-colors duration-200 text-center"
                   >
                     Sign Up
                   </Link>
@@ -254,4 +339,3 @@ export default function Navbar() {
     </nav>
   );
 }
-

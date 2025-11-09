@@ -51,13 +51,13 @@ export default function NewsletterForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all text-sm"
+            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
             disabled={status === "loading"}
           />
           <button
             type="submit"
             disabled={status === "loading" || !email}
-            className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-premium-lg hover:shadow-premium-xl hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none whitespace-nowrap"
           >
             {status === "loading" ? "Subscribing..." : "Subscribe"}
           </button>
@@ -66,10 +66,10 @@ export default function NewsletterForm() {
 
       {message && (
         <div
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-4 rounded-xl border ${
             status === "success"
-              ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-              : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+              ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800"
+              : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800"
           }`}
           role="alert"
         >
@@ -77,7 +77,7 @@ export default function NewsletterForm() {
         </div>
       )}
 
-      <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+      <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
         We'll send you the latest marketing examples and insights. No spam, unsubscribe anytime.
       </p>
     </form>

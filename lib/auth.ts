@@ -1,5 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
+import { prisma } from "./prisma";
 
 const secretKey = process.env.AUTH_SECRET || "your-secret-key-change-in-production";
 const key = new TextEncoder().encode(secretKey);
@@ -47,5 +49,28 @@ export async function getSession() {
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
+}
+
+export async function getUser(request?: NextRequest) {
+  let session;
+  if (request) {
+    const sessionCookie = request.cookies.get("session")?.value;
+    if (!sessionCookie) return null;
+    session = await decrypt(sessionCookie);
+  } else {
+    session = await getSession();
+  }
+  
+  if (!session || !session.userId) return null;
+  
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId as string },
+      select: { id: true, email: true, name: true },
+    });
+    return user;
+  } catch (error) {
+    return null;
+  }
 }
 

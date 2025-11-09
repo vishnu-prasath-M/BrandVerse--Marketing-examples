@@ -48,17 +48,6 @@ export default function SignInPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/signout", { method: "POST" });
-      await refresh();
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -68,43 +57,37 @@ export default function SignInPage() {
 
   if (user) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center px-4 py-20">
         <div className="max-w-md w-full">
-          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+          <div className="glass-strong rounded-2xl border border-slate-200 dark:border-slate-700 p-8 text-center shadow-premium-lg">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4 shadow-premium">
               <svg
-                className="w-8 h-8 text-gray-600 dark:text-gray-400"
+                className="w-8 h-8 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                strokeWidth={2}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  d="M5 13l4 4L19 7"
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
               You're signed in
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
               {user?.name || user?.email}
             </p>
             <div className="space-y-3">
-              <a
+              <Link
                 href="/"
-                className="block w-full px-4 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium text-sm text-center"
+                className="block w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-premium-lg hover:shadow-premium-xl hover:scale-105 transform text-center"
               >
                 Go to Home
-              </a>
-              <button
-                onClick={handleLogout}
-                className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium text-sm"
-              >
-                Sign Out
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -113,34 +96,34 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center px-4 py-20 page-transition">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center space-x-2.5 mb-6">
+          <Link href="/" className="inline-flex items-center space-x-3 mb-6 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-600 rounded-lg blur opacity-20"></div>
-              <div className="relative w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">M</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+              <div className="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-premium">
+                <span className="text-white font-bold text-lg">BV</span>
               </div>
             </div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
-              MarketingExamples
+            <span className="text-xl font-bold font-poppins bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+              Brand Verse
             </span>
-          </a>
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-2">
+          </Link>
+          <h1 className="text-4xl font-bold font-poppins text-slate-900 dark:text-white mb-2">
             Sign in
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-slate-600 dark:text-slate-400">
             Access your account to continue
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="glass-strong rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-premium-lg">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
               >
                 Email
               </label>
@@ -151,7 +134,7 @@ export default function SignInPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 text-black border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 placeholder="you@example.com"
               />
             </div>
@@ -159,7 +142,7 @@ export default function SignInPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
               >
                 Password
               </label>
@@ -170,17 +153,17 @@ export default function SignInPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 text-black border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 placeholder="Enter your password"
               />
             </div>
 
             {message && (
               <div
-                className={`p-3 rounded-lg text-sm ${
+                className={`p-4 rounded-xl border ${
                   status === "success"
-                    ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-                    : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                    ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800"
+                    : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800"
                 }`}
                 role="alert"
               >
@@ -191,21 +174,21 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full px-4 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-premium-lg hover:shadow-premium-xl hover:scale-105 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {status === "loading" ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Don't have an account?{" "}
-              <a
+              <Link
                 href="/signup"
-                className="text-gray-900 dark:text-white font-medium hover:underline"
+                className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
               >
                 Sign up
-              </a>
+              </Link>
             </p>
           </div>
         </div>
@@ -213,4 +196,3 @@ export default function SignInPage() {
     </div>
   );
 }
-

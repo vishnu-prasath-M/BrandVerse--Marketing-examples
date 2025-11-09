@@ -6,6 +6,10 @@ import CategoryChips from "@/components/CategoryChips";
 import ExampleCard from "@/components/ExampleCard";
 import LoadMoreButton from "@/components/LoadMoreButton";
 import NewsletterForm from "@/components/NewsletterForm";
+import SkeletonLoader from "@/components/SkeletonLoader";
+import Testimonials from "@/components/Testimonials";
+import FAQ from "@/components/FAQ";
+import Goals from "@/components/Goals";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -114,20 +118,20 @@ function HomeContent() {
   };
 
   return (
-    <div>
+    <div className="page-transition">
       <Hero />
 
       {/* Optional welcome + newsletter for authenticated users */}
       {user && (
-        <section id="newsletter" className="py-14 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <section className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 border-t border-slate-200 dark:border-slate-800">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-3xl font-bold font-poppins text-slate-900 dark:text-white mb-3">
               Welcome back, {user.name || user.email}!
             </h2>
-            <p className="text-base text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-base text-slate-600 dark:text-slate-400 mb-6">
               Stay updated with the latest marketing examples and insights.
             </p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="glass-strong rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-premium">
               <NewsletterForm />
             </div>
           </div>
@@ -135,13 +139,13 @@ function HomeContent() {
       )}
 
       {/* Categories Section */}
-      <section id="categories" className="py-12 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <section className="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-3xl font-bold font-poppins text-slate-900 dark:text-white mb-2">
               Browse by Category
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-slate-600 dark:text-slate-400">
               Filter examples by marketing category
             </p>
           </div>
@@ -150,30 +154,19 @@ function HomeContent() {
       </section>
 
       {/* Examples Grid */}
-      <section id="examples" className="py-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+      <section id="examples" className="py-16 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading && examples.length === 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(9)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm animate-pulse"
-                >
-                  <div className="aspect-video bg-gray-200 dark:bg-gray-700" />
-                  <div className="p-4">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-                  </div>
-                </div>
-              ))}
+              <SkeletonLoader count={9} type="card" />
             </div>
           ) : examples.length > 0 ? (
             <>
               <div className="mb-8 text-center">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-3xl font-bold font-poppins text-slate-900 dark:text-white mb-2">
                   Marketing Examples
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-slate-600 dark:text-slate-400">
                   {category ? `Examples in ${categories.find(c => c.slug === category)?.name || category}` : "Discover real marketing campaigns from top brands"}
                 </p>
               </div>
@@ -199,7 +192,7 @@ function HomeContent() {
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400 text-lg">
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
                 No examples found. Try a different category or search term.
               </p>
             </div>
@@ -207,36 +200,31 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-            Ready to improve your marketing?
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Browse our curated collection of real marketing examples from top brands.
-          </p>
-          <a
-            href="/examples"
-            className="inline-flex items-center px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
-          >
-            Explore all examples
-            <svg
-              className="ml-2 h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </a>
-        </div>
-      </section>
+      {/* Goals Section */}
+      <Goals />
+
+      {/* Testimonials Section */}
+      <Testimonials />
+
+      {/* FAQ Section */}
+      <FAQ />
+
+      {/* Newsletter Section */}
+      {!user && (
+        <section className="py-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold font-poppins text-slate-900 dark:text-white mb-3">
+              Stay Updated
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              Subscribe to our newsletter and get the latest marketing examples delivered to your inbox.
+            </p>
+            <div className="glass-strong rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-premium">
+              <NewsletterForm />
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -245,11 +233,10 @@ export default function Home() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+        <SkeletonLoader count={1} type="card" />
       </div>
     }>
       <HomeContent />
     </Suspense>
   );
 }
-
