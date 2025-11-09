@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { prisma } from "@/lib/prisma";
 import ExampleCard from "@/components/ExampleCard";
 import CommentsSection from "@/components/CommentsSection";
+import DownloadButton from "@/components/DownloadButton";
 
 interface Category {
   id: string;
@@ -253,8 +254,13 @@ export default async function ExampleDetailPage({
           <ReactMarkdown>{example.body || example.description}</ReactMarkdown>
         </div>
 
+        {/* Download Button */}
+        <div className="mb-8 flex justify-center">
+          <DownloadButton exampleSlug={example.slug} />
+        </div>
+
         {/* Comments Section */}
-        <CommentsSection exampleId={example.id} />
+        <CommentsSection exampleSlug={example.slug} />
 
         {/* Navigation */}
         <div className="flex justify-between items-center py-8 border-t border-b border-slate-200 dark:border-slate-700 mt-12 gap-4">

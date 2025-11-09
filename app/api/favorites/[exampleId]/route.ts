@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/auth";
 
+const PLAN_LIMITS: Record<string, { maxSaves: number }> = {
+  Free: { maxSaves: 5 },
+  Standard: { maxSaves: 20 },
+  Premium: { maxSaves: Infinity },
+};
+
+function canSaveExample(plan: string, currentSaves: number): boolean {
+  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.Free;
+  return currentSaves < limits.maxSaves;
+}
+
+function getUpgradeMessage(plan: string): string {
+  if (plan === "Free") {
+    return "This feature is available only for Standard or Premium users.";
+  }
+  return "Please upgrade your plan to access this feature.";
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { exampleId: string } }
@@ -9,10 +27,22 @@ export async function POST(
   try {
     const user = await getUser(request);
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized", message: "Please sign in to continue" }, { status: 401 });
     }
 
     const { exampleId } = params;
+
+    // Get full user data with plan
+    const fullUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        favorites: true,
+      },
+    });
+
+    if (!fullUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     // Check if example exists
     const example = await prisma.example.findUnique({
@@ -35,6 +65,19 @@ export async function POST(
 
     if (existing) {
       return NextResponse.json({ message: "Already favorited", isFavorite: true });
+    }
+
+    // Check plan limits
+    const currentSaves = fullUser.favorites.length;
+    if (!canSaveExample(fullUser.plan, currentSaves)) {
+      return NextResponse.json(
+        { 
+          error: "Limit reached", 
+          message: getUpgradeMessage(fullUser.plan),
+          requiresUpgrade: true 
+        },
+        { status: 403 }
+      );
     }
 
     // Create favorite
@@ -111,6 +154,7 @@ export async function GET(
     return NextResponse.json({ isFavorite: false });
   }
 }
+
 
 
 

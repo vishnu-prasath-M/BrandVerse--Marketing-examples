@@ -22,6 +22,7 @@ model Example {
   updatedAt       DateTime         @updatedAt
   categories      ExampleCategory[]
   favorites       Favorite[]
+  comments        Comment[]
 
   @@index([slug])
   @@index([createdAt])
@@ -59,14 +60,21 @@ model Subscription {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  activityLogs ActivityLog[]
-  favorites Favorite[]
+  id              String      @id @default(cuid())
+  email           String      @unique
+  name            String?
+  password        String
+  plan            String      @default("Free") // Free, Standard, Premium
+  downloadCount   Int         @default(0)
+  downloadsThisMonth Int      @default(0)
+  commentsThisMonth Int       @default(0)
+  lastResetDate   DateTime?   // For monthly reset
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  activityLogs    ActivityLog[]
+  favorites       Favorite[]
+  comments        Comment[]
+  purchases       Purchase[]
 
   @@index([email])
 }
@@ -90,5 +98,33 @@ model Favorite {
   @@unique([userId, exampleId])
   @@index([userId])
   @@index([exampleId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  exampleId String
+  text      String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  example   Example  @relation(fields: [exampleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([exampleId])
+  @@index([userId])
+}
+
+model Purchase {
+  id            String   @id @default(cuid())
+  userId        String
+  plan          String   // Standard or Premium
+  amount        Float
+  transactionId String   @unique
+  status        String   @default("completed") // completed, pending, failed
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([transactionId])
 }
 

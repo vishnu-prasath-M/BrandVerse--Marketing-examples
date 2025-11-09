@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthProvider";
+import UpgradeModal from "./UpgradeModal";
 
 interface Category {
   id: string;
@@ -47,6 +48,9 @@ export default function ExampleCard({
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isHovered, setIsHovered] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeMessage, setUpgradeMessage] = useState("");
+  const [requiresUpgrade, setRequiresUpgrade] = useState(false);
   const safeCategories = Array.isArray(categories) ? categories : [];
 
   useEffect(() => {
@@ -64,8 +68,9 @@ export default function ExampleCard({
     e.stopPropagation();
     
     if (!user) {
-      // Redirect to sign in
-      window.location.href = "/signin";
+      setUpgradeMessage("Please sign in to save examples");
+      setRequiresUpgrade(false);
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -77,8 +82,20 @@ export default function ExampleCard({
         method: newFavoriteState ? "POST" : "DELETE",
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
         setIsFavorite(!newFavoriteState); // Revert on error
+        
+        if (response.status === 401) {
+          setUpgradeMessage(data.message || "Please sign in to continue");
+          setRequiresUpgrade(false);
+          setShowUpgradeModal(true);
+        } else if (response.status === 403) {
+          setUpgradeMessage(data.message || "This feature requires an upgrade");
+          setRequiresUpgrade(data.requiresUpgrade || false);
+          setShowUpgradeModal(true);
+        }
       } else {
         onFavoriteToggle?.(id, newFavoriteState);
       }
@@ -89,12 +106,19 @@ export default function ExampleCard({
   };
 
   return (
-    <Link
-      href={`/examples/${slug}`}
-      className="group block relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <>
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        message={upgradeMessage}
+        requiresUpgrade={requiresUpgrade}
+      />
+      <Link
+        href={`/examples/${slug}`}
+        className="group block relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
       <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-500 shadow-premium hover:shadow-premium-xl transform hover:-translate-y-2">
         {/* Image Container */}
         <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -186,5 +210,6 @@ export default function ExampleCard({
         </div>
       </div>
     </Link>
+    </>
   );
 }

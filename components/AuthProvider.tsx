@@ -6,6 +6,10 @@ interface User {
   id: string;
   email: string;
   name?: string | null;
+  plan?: string;
+  downloadCount?: number;
+  downloadsThisMonth?: number;
+  commentsThisMonth?: number;
 }
 
 interface AuthContextType {

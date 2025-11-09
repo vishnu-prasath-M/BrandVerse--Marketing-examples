@@ -16,6 +16,10 @@ export async function GET() {
         id: true,
         email: true,
         name: true,
+        plan: true,
+        downloadCount: true,
+        downloadsThisMonth: true,
+        commentsThisMonth: true,
       },
     });
 
